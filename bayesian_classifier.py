@@ -5,11 +5,9 @@ class BayesianClassifier:
     Implementation of Naive Bayes classification algorithm.
     """
     def __init__(self):
-        pass
-
-    def split_tweet(self, tweet: str) -> list:
-        '''preprocess tweet - extract words'''
-        return tweet.split()
+        self.neutral_probability = None
+        self.discrim_probability = None
+        self.likelyhood_table = None
 
     def count_df(self, tweets, labels) -> (dict, int, int):
         '''
@@ -21,7 +19,7 @@ class BayesianClassifier:
         discrim = neutral = 0
 
         for tweet, label in zip(tweets, labels):
-            for word in self.split_tweet(tweet):
+            for word in tweet:
                 if word not in words_dict:
                     words_dict[word] = {'neutral': 0, 'discrim': 0}
 
@@ -57,14 +55,13 @@ class BayesianClassifier:
         returns:
             probabilities the tweet is discriminatory\neutral
         '''
-        words = self.split_tweet(tweet)
         p_neutral = self.neutral_probability  #basic assumption
         p_discrim = self.discrim_probability  #basic assumption
-        for word in set(words):
+        for word in tweet:
             if word in self.likelyhood_table:
                 p_neutral *= self.likelyhood_table[word]['neutral']
                 p_discrim *= self.likelyhood_table[word]['discrim']
-            p_neutral, p_discrim = p_neutral/(p_neutral+p_discrim), p_discrim/(p_neutral+p_discrim)
+        p_neutral, p_discrim = p_neutral/(p_neutral+p_discrim), p_discrim/(p_neutral+p_discrim)
         return p_discrim, p_neutral
 
     def fit(self, X: list, y: list):
